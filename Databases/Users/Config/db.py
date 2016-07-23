@@ -1,3 +1,3 @@
-HOST = 'localhost'
+HOST = '192.168.99.100'
 
-PORT = 27017
+PORT = 32769

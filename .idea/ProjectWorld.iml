@@ -5,7 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/Docs" />
       <excludeFolder url="file://$MODULE_DIR$/Interpreter" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.4.4 virtualenv at C:\Users\Alexey\PycharmProjects\ProjectWorld\Interpreter" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">

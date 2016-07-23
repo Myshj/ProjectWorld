@@ -1,10 +1,12 @@
-from Databases.Users.Workers.Login.tasks import login_user
+from Databases.Users.Workers.Login.tasks import login_user, logout_user
+from Databases.Users.Workers.Registration.tasks import remove_user, register_user
+from Databases.Users.Workers.UserActivityReporter.tasks import report_user_activity
 
-# result = remove_user.delay('test', 'test')
-# result = register_user.delay("test", 'test', ['test@test.com', 'test1@test.com'])
-# result = login_user.delay('test', 'test')
-# result = logout_user.delay('test', 'test')
-# result = user_is_alive.delay('test', 'test')
+result = remove_user.delay('test', 'test')
+result = register_user.delay("test", 'test', ['test@test.com', 'test1@test.com'])
+result = login_user.delay('test', 'test')
+result = logout_user.delay('test', 'test')
+result = report_user_activity.delay('test', 'test')
 # print(result.get(timeout=10))
 #
 # time1 = datetime.now()
@@ -19,4 +21,4 @@ from Databases.Users.Workers.Login.tasks import login_user
 # # print('timedelta1:', timedelta1)
 # # print('timedelta2:', timedelta2)
 
-login_user('test', 'test')
+login_user.delay('test', 'test')

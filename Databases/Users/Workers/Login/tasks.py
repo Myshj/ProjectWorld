@@ -2,6 +2,7 @@ import pymongo
 from celery import Celery
 
 from Databases.Users.Config import db as db_config
+from Databases.Users.Workers.UserActivityReporter.tasks import report_user_activity
 
 app = Celery()
 app.config_from_object('Databases.Users.Workers.Login.celeryconfig')
@@ -19,9 +20,9 @@ def login_user(login, password):
     :param str password: User's password.
     :return bool: True if user logged in. False otherwise.
     """
+    report_user_activity.delay(login, password)
     return db.users.update_one({'login': login, 'password': password},
-                               {'$set': {'online': True},
-                                '$currentDate': {'last_activity': True}}).modified_count == 1
+                               {'$set': {'online': True}}).modified_count == 1
 
 
 @app.task
@@ -32,18 +33,6 @@ def logout_user(login, password):
     :param str password: User's password.
     :return bool: True if user logged out. False otherwise.
     """
+    report_user_activity.delay(login, password)
     return db.users.update_one({'login': login, 'password': password},
-                               {'$set': {'online': False},
-                                '$currentDate': {'last_activity': True}}).modified_count == 1
-
-
-@app.task
-def user_is_alive(login, password):
-    """
-    Notifies that user has connection to the server.
-    :param str login:
-    :param str password:
-    :return bool: True if notified successfully. False otherwise.
-    """
-    return db.users.update_one({'login': login, 'password': password},
-                               {'$currentDate': {'last_activity': True}}).modified_count == 1
+                               {'$set': {'online': False}}).modified_count == 1

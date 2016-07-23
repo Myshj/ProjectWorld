@@ -1,19 +1,7 @@
-from datetime import timedelta
-
 from kombu import Exchange, Queue
 
-CELERYBEAT_SCHEDULE = {
-    'clean_afk': {
-        'task': 'Databases.Users.Workers.AfkCleaner.tasks.clean_afk_users',
-        'schedule': timedelta(seconds=10)  # ,
-        # 'args': ()
-    },
-}
-
-CELERY_TIMEZONE = 'UTC'
-
 # Broker settings.
-BROKER_URL = 'amqp://guest:guest@localhost//'
+BROKER_URL = 'amqp://guest:guest@192.168.99.100:32778//'
 
 # List of modules to import when celery starts.
 CELERY_IMPORTS = ('Databases.Users.Workers.AfkCleaner.tasks',)

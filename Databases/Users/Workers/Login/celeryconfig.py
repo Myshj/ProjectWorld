@@ -1,7 +1,7 @@
 from kombu import Queue, Exchange
 
 # Broker settings.
-BROKER_URL = 'amqp://guest:guest@localhost//'
+BROKER_URL = 'amqp://guest:guest@192.168.99.100:32778//'
 
 # List of modules to import when celery starts.
 CELERY_IMPORTS = ('Databases.Users.Workers.Login.tasks',)

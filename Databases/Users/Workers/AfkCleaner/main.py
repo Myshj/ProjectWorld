@@ -3,9 +3,10 @@ import pymongo
 from BaseClasses.AMQP.Async.Listener import Worker as amqp_listener
 from BaseClasses.AMQP.Async.Sender import Worker as amqp_sender
 from Databases.Users.Config import db as db_config
-from Databases.Users.Workers.Login.Config import login_listener as amqp_listener_config
-from Databases.Users.Workers.Login.Config import user_activity_sender as amqp_sender_config
-from Databases.Users.Workers.Login.Loginer import Loginer
+from Databases.Users.Workers.AfkCleaner.AfkCleaner import AfkCleaner
+from Databases.Users.Workers.AfkCleaner.Config import amqp as amqp_listener_config
+from Databases.Users.Workers.AfkCleaner.Config import general as general_config
+from Databases.Users.Workers.AfkCleaner.Config import logout_sender as amqp_sender_config
 
 AMQP_SENDER = amqp_sender('amqp://{0}:{1}@{2}:{3}/%2F'.format(amqp_sender_config.USER,
                                                               amqp_sender_config.PASSWORD,
@@ -16,9 +17,10 @@ AMQP_SENDER = amqp_sender('amqp://{0}:{1}@{2}:{3}/%2F'.format(amqp_sender_config
                           queue=amqp_sender_config.QUEUE,
                           routing_key=amqp_sender_config.ROUTING_KEY)
 
-LOGINER = Loginer(
+AFK_CLEANER = AfkCleaner(
     pymongo.MongoClient(host=db_config.HOST, port=db_config.PORT).project_world,
-    AMQP_SENDER
+    AMQP_SENDER,
+    general_config
 )
 
 AMQP_LISTENER = amqp_listener('amqp://{0}:{1}@{2}:{3}/%2F'.format(amqp_listener_config.USER,
@@ -30,7 +32,7 @@ AMQP_LISTENER = amqp_listener('amqp://{0}:{1}@{2}:{3}/%2F'.format(amqp_listener_
                               queue=amqp_listener_config.QUEUE,
                               routing_key=amqp_listener_config.ROUTING_KEY,
                               prefetch_count=amqp_listener_config.PREFETCH_COUNT,
-                              callback=LOGINER.do_command)
+                              callback=AFK_CLEANER.do_command)
 
 if __name__ == '__main__':
     import logging

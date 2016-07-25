@@ -4,16 +4,11 @@ HOST = "192.168.99.100"
 # Порт очереди для прослушивания.
 PORT = 32778
 
-# Имя очереди для прослушивания.
-QUEUE = "login"
-
 # Сколько сообщений из очереди резервируем для себя.
 PREFETCH_COUNT = 1
 
 # Используем ли SSL.
 USE_SSL = False
-
-PUBLISH_INTERVAL = 0.1
 
 # С какими параметрами используем SSL.
 # SSL_OPTIONS = {"ca_certs": "/etc/rabbitmq/testca/cacert.pem",
@@ -21,15 +16,19 @@ PUBLISH_INTERVAL = 0.1
 #                "keyfile": "/etc/rabbitmq/client/key.pem",
 #                "cert_reqs": ssl.CERT_REQUIRED,
 #                "server_side": False}
+SSL_OPTIONS = ''
+
+# Имя очереди для прослушивания.
+QUEUE = "registration"
 
 # Имя точки обмена.
-EXCHANGE = 'login'
+EXCHANGE = 'registration'
+
+# Какие сообщения будем получать.
+ROUTING_KEY = 'registration'
 
 # Тип точки обмена.
 EXCHANGE_TYPE = 'topic'
-
-# Какие сообщения будем получать.
-ROUTING_KEY = 'login'
 
 # Под каким пользователем заходим.
 USER = 'guest'

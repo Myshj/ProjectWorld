@@ -5,7 +5,7 @@ import logging
 import threading
 import time
 
-from Client.BaseClasses.AMQP.Async.Listener import Worker as AsyncListener
+from BaseClasses.AMQP.Async.Listener import Worker as AsyncListener
 from Client.UserInterfaceInteraction.LoginListener.Config import amqp as AMQP_Config
 from Client.UserInterfaceInteraction.LoginListener.Config import worker as worker_config
 from Databases.Users.Workers.Login.tasks import login_user, logout_user

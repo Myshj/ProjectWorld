@@ -19,7 +19,7 @@ class Worker(object):
     messages that have been sent and if they've been confirmed by RabbitMQ.
     """
 
-    def __init__(self, amqp_url, exchange, exchange_type, queue, routing_key):
+    def __init__(self, send_to_parameters):
         """Setup the example publisher object, passing in the URL we will use
         to connect to RabbitMQ.
         :param str amqp_url: The URL for connecting to RabbitMQ
@@ -31,14 +31,9 @@ class Worker(object):
         self._acked = None
         self._nacked = None
         self._message_number = None
-
         self._stopping = False
-        self._url = amqp_url
 
-        self._exchange = exchange
-        self._exchange_type = exchange_type
-        self._queue = queue
-        self._routing_key = routing_key
+        self._send_to_parameters = send_to_parameters
 
     def connect(self):
         """This method connects to RabbitMQ, returning the connection handle.
@@ -48,8 +43,8 @@ class Worker(object):
         behavior of this adapter.
         :rtype: pika.SelectConnection
         """
-        LOGGER.info('Connecting to %s', self._url)
-        return pika.SelectConnection(pika.URLParameters(self._url),
+        LOGGER.info('Connecting to %s', self._send_to_parameters['url'])
+        return pika.SelectConnection(pika.URLParameters(self._send_to_parameters['url']),
                                      on_open_callback=self.on_connection_open,
                                      on_close_callback=self.on_connection_closed,
                                      stop_ioloop_on_close=False)
@@ -97,7 +92,7 @@ class Worker(object):
         LOGGER.info('Channel opened')
         self._channel = channel
         self.add_on_channel_close_callback()
-        self.setup_exchange(self._exchange)
+        self.setup_exchange(self._send_to_parameters['exchange'])
 
     def add_on_channel_close_callback(self):
         """This method tells pika to call the on_channel_closed method if
@@ -130,7 +125,7 @@ class Worker(object):
         LOGGER.info('Declaring exchange %s', exchange_name)
         self._channel.exchange_declare(self.on_exchange_declareok,
                                        exchange_name,
-                                       self._exchange_type)
+                                       self._send_to_parameters['exchange_type'])
 
     def on_exchange_declareok(self, unused_frame):
         """Invoked by pika when RabbitMQ has finished the Exchange.Declare RPC
@@ -138,7 +133,7 @@ class Worker(object):
         :param pika.Frame.Method unused_frame: Exchange.DeclareOk response frame
         """
         LOGGER.info('Exchange declared')
-        self.setup_queue(self._queue)
+        self.setup_queue(self._send_to_parameters['queue'])
 
     def setup_queue(self, queue_name):
         """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -158,9 +153,13 @@ class Worker(object):
         :param pika.frame.Method method_frame: The Queue.DeclareOk frame
         """
         LOGGER.info('Binding %s to %s with %s',
-                    self._exchange, self._queue, self._routing_key)
-        self._channel.queue_bind(self.on_bindok, self._queue,
-                                 self._exchange, self._routing_key)
+                    self._send_to_parameters['exchange'],
+                    self._send_to_parameters['queue'],
+                    self._send_to_parameters['routing_key'])
+        self._channel.queue_bind(self.on_bindok,
+                                 self._send_to_parameters['queue'],
+                                 self._send_to_parameters['exchange'],
+                                 self._send_to_parameters['routing_key'])
 
     def on_bindok(self, unused_frame):
         """This method is invoked by pika when it receives the Queue.BindOk
@@ -232,7 +231,8 @@ class Worker(object):
                                           content_type='application/json',
                                           headers=message)
 
-        self._channel.basic_publish(self._exchange, self._routing_key,
+        self._channel.basic_publish(self._send_to_parameters['exchange'],
+                                    self._send_to_parameters['routing_key'],
                                     json.dumps(message),
                                     properties)
         self._message_number += 1

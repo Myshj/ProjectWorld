@@ -4,14 +4,7 @@ from BaseClasses.AMQP.Async.PeriodicSender import Worker as amqp_periodic_sender
 from Databases.Users.Periodics.AfkCleaner.Config import amqp as amqp_config
 from Databases.Users.Periodics.AfkCleaner.Config import general as general_config
 
-PERIODIC_AFK_CLEANER = amqp_periodic_sender('amqp://{0}:{1}@{2}:{3}/%2F'.format(amqp_config.USER,
-                                                                                amqp_config.PASSWORD,
-                                                                                amqp_config.HOST,
-                                                                                amqp_config.PORT),
-                                            exchange=amqp_config.EXCHANGE,
-                                            exchange_type=amqp_config.EXCHANGE_TYPE,
-                                            queue=amqp_config.QUEUE,
-                                            routing_key=amqp_config.ROUTING_KEY,
+PERIODIC_AFK_CLEANER = amqp_periodic_sender(amqp_config.SEND_TO_PARAMETERS,
                                             publish_interval=general_config.INTERVAL,
                                             message=general_config.MESSAGE_TO_SEND)
 

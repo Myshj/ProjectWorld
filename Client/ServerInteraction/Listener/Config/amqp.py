@@ -4,9 +4,6 @@ HOST = "192.168.99.100"
 # Порт очереди для прослушивания.
 PORT = 32778
 
-# Имя очереди для прослушивания.
-QUEUE = "from_user_interface"
-
 # Сколько сообщений из очереди резервируем для себя.
 PREFETCH_COUNT = 1
 
@@ -21,14 +18,17 @@ USE_SSL = False
 #                "server_side": False}
 SSL_OPTIONS = ''
 
+# Имя очереди для прослушивания.
+QUEUE = "from_server"
+
 # Имя точки обмена.
-EXCHANGE = 'from_user_interface'
+EXCHANGE = 'from_server'
+
+# Какие сообщения будем получать.
+ROUTING_KEY = 'from_server'
 
 # Тип точки обмена.
 EXCHANGE_TYPE = 'topic'
-
-# Какие сообщения будем получать.
-ROUTING_KEY = 'login'
 
 # Под каким пользователем заходим.
 USER = 'guest'

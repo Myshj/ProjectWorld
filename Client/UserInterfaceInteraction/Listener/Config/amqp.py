@@ -19,13 +19,13 @@ USE_SSL = False
 SSL_OPTIONS = ''
 
 # Имя очереди для прослушивания.
-QUEUE = "to_user_interface"
+QUEUE = "from_user_interface"
 
 # Имя точки обмена.
-EXCHANGE = 'to_user_interface'
+EXCHANGE = 'from_user_interface'
 
 # Какие сообщения будем получать.
-ROUTING_KEY = 'to_user_interface'
+ROUTING_KEY = 'from_user_interface'
 
 # Тип точки обмена.
 EXCHANGE_TYPE = 'topic'

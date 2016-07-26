@@ -21,29 +21,17 @@ class Worker(object):
     commands that were issued and that should surface in the output as well.
     """
 
-    def __init__(self, amqp_url, exchange, exchange_type, queue, routing_key, prefetch_count,
-                 callback):
+    def __init__(self, listen_from_parameters, callback):
         """Create a new instance of the consumer class, passing in the AMQP
         URL used to connect to RabbitMQ.
-        :param str amqp_url: The AMQP url to connect with
-        :param str exchange: The AMQP exchange to connect with
-        :param str exchange_type: Type of AMQP exchange
-        :param str queue: The name of AMQP queue to listen to
-        :param str routing_key: The routing key for messages
-        :param int prefetch_count: Number of messages to reserve.
         :param callback: Function to call when message arrives.
         """
         self._connection = None
         self._channel = None
         self._closing = False
         self._consumer_tag = None
-        self._url = amqp_url
 
-        self._exchange = exchange
-        self._exchange_type = exchange_type
-        self._queue = queue
-        self._routing_key = routing_key
-        self._prefetch_count = prefetch_count
+        self._listen_from_parameters = listen_from_parameters
 
         self._callback = callback
 
@@ -53,8 +41,8 @@ class Worker(object):
         will be invoked by pika.
         :rtype: pika.SelectConnection
         """
-        LOGGER.info('Connecting to %s', self._url)
-        return pika.SelectConnection(pika.URLParameters(self._url),
+        LOGGER.info('Connecting to %s', self._listen_from_parameters['url'])
+        return pika.SelectConnection(pika.URLParameters(self._listen_from_parameters['url']),
                                      self.on_connection_open,
                                      stop_ioloop_on_close=False)
 
@@ -120,10 +108,10 @@ class Worker(object):
         :param pika.channel.Channel channel: The channel object
         """
         LOGGER.info('Channel opened')
-        channel.basic_qos(prefetch_count=self._prefetch_count)
+        channel.basic_qos(prefetch_count=self._listen_from_parameters['prefetch_count'])
         self._channel = channel
         self.add_on_channel_close_callback()
-        self.setup_exchange(self._exchange)
+        self.setup_exchange(self._listen_from_parameters['exchange'])
 
     def add_on_channel_close_callback(self):
         """This method tells pika to call the on_channel_closed method if
@@ -155,7 +143,7 @@ class Worker(object):
         LOGGER.info('Declaring exchange %s', exchange_name)
         self._channel.exchange_declare(self.on_exchange_declareok,
                                        exchange_name,
-                                       self._exchange_type)
+                                       self._listen_from_parameters['exchange_type'])
 
     def on_exchange_declareok(self, unused_frame):
         """Invoked by pika when RabbitMQ has finished the Exchange.Declare RPC
@@ -163,7 +151,7 @@ class Worker(object):
         :param pika.Frame.Method unused_frame: Exchange.DeclareOk response frame
         """
         LOGGER.info('Exchange declared')
-        self.setup_queue(self._queue)
+        self.setup_queue(self._listen_from_parameters['queue'])
 
     def setup_queue(self, queue_name):
         """Setup the queue on RabbitMQ by invoking the Queue.Declare RPC
@@ -183,9 +171,13 @@ class Worker(object):
         :param pika.frame.Method method_frame: The Queue.DeclareOk frame
         """
         LOGGER.info('Binding %s to %s with %s',
-                    self._exchange, self._queue, self._routing_key)
-        self._channel.queue_bind(self.on_bindok, self._queue,
-                                 self._exchange, self._routing_key)
+                    self._listen_from_parameters['exchange'],
+                    self._listen_from_parameters['queue'],
+                    self._listen_from_parameters['routing_key'])
+        self._channel.queue_bind(self.on_bindok,
+                                 self._listen_from_parameters['queue'],
+                                 self._listen_from_parameters['exchange'],
+                                 self._listen_from_parameters['routing_key'])
 
     def on_bindok(self, unused_frame):
         """Invoked by pika when the Queue.Bind method has completed. At this
@@ -208,7 +200,7 @@ class Worker(object):
         LOGGER.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
         self._consumer_tag = self._channel.basic_consume(self.on_message,
-                                                         self._queue)
+                                                         self._listen_from_parameters['queue'])
 
     def add_on_cancel_callback(self):
         """Add a callback that will be invoked if RabbitMQ cancels the consumer

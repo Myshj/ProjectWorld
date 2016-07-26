@@ -8,14 +8,7 @@ from Databases.Users.Workers.AfkCleaner.Config import amqp as amqp_listener_conf
 from Databases.Users.Workers.AfkCleaner.Config import general as general_config
 from Databases.Users.Workers.AfkCleaner.Config import logout_sender as amqp_sender_config
 
-AMQP_SENDER = amqp_sender('amqp://{0}:{1}@{2}:{3}/%2F'.format(amqp_sender_config.USER,
-                                                              amqp_sender_config.PASSWORD,
-                                                              amqp_sender_config.HOST,
-                                                              amqp_sender_config.PORT),
-                          exchange=amqp_sender_config.EXCHANGE,
-                          exchange_type=amqp_sender_config.EXCHANGE_TYPE,
-                          queue=amqp_sender_config.QUEUE,
-                          routing_key=amqp_sender_config.ROUTING_KEY)
+AMQP_SENDER = amqp_sender(send_to_parameters=amqp_sender_config.SEND_TO_PARAMETERS)
 
 AFK_CLEANER = AfkCleaner(
     pymongo.MongoClient(host=db_config.HOST, port=db_config.PORT).project_world,
@@ -23,15 +16,7 @@ AFK_CLEANER = AfkCleaner(
     general_config
 )
 
-AMQP_LISTENER = amqp_listener('amqp://{0}:{1}@{2}:{3}/%2F'.format(amqp_listener_config.USER,
-                                                                  amqp_listener_config.PASSWORD,
-                                                                  amqp_listener_config.HOST,
-                                                                  amqp_listener_config.PORT),
-                              exchange=amqp_listener_config.EXCHANGE,
-                              exchange_type=amqp_listener_config.EXCHANGE_TYPE,
-                              queue=amqp_listener_config.QUEUE,
-                              routing_key=amqp_listener_config.ROUTING_KEY,
-                              prefetch_count=amqp_listener_config.PREFETCH_COUNT,
+AMQP_LISTENER = amqp_listener(listen_from_parameters=amqp_listener_config.LISTEN_FROM_PARAMETERS,
                               callback=AFK_CLEANER.do_command)
 
 if __name__ == '__main__':

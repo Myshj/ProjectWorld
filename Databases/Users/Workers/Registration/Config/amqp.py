@@ -4,9 +4,6 @@ HOST = "192.168.99.100"
 # Порт очереди для прослушивания.
 PORT = 32778
 
-# Сколько сообщений из очереди резервируем для себя.
-PREFETCH_COUNT = 1
-
 # Используем ли SSL.
 USE_SSL = False
 
@@ -18,20 +15,17 @@ USE_SSL = False
 #                "server_side": False}
 SSL_OPTIONS = ''
 
-# Имя очереди для прослушивания.
-QUEUE = "registration"
-
-# Имя точки обмена.
-EXCHANGE = 'registration'
-
-# Какие сообщения будем получать.
-ROUTING_KEY = 'registration'
-
-# Тип точки обмена.
-EXCHANGE_TYPE = 'topic'
-
 # Под каким пользователем заходим.
 USER = 'guest'
 
 # Пароль пользователя.
 PASSWORD = 'guest'
+
+LISTEN_FROM_PARAMETERS = {
+    'url': 'amqp://{0}:{1}@{2}:{3}/%2F'.format(USER, PASSWORD, HOST, PORT),
+    'exchange_type': 'topic',
+    'exchange': 'registration',
+    'queue': 'registration',
+    'routing_key': 'registration',
+    'prefetch_count': 1
+}

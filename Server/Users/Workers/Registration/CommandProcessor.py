@@ -1,7 +1,7 @@
 import datetime
 
 
-class Registrationer(object):
+class CommandProcessor(object):
     def __init__(self, db):
         self._db = db
 

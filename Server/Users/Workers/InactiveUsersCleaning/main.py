@@ -2,15 +2,15 @@ import pymongo
 
 from BaseClasses.AMQP.Async.Listener import Worker as amqp_listener
 from BaseClasses.AMQP.Async.Sender import Worker as amqp_sender
-from Databases.Users.Config import db as db_config
-from Databases.Users.Workers.AfkCleaner.AfkCleaner import AfkCleaner
-from Databases.Users.Workers.AfkCleaner.Config import amqp as amqp_listener_config
-from Databases.Users.Workers.AfkCleaner.Config import general as general_config
-from Databases.Users.Workers.AfkCleaner.Config import logout_sender as amqp_sender_config
+from Server.Users.Config import db as db_config
+from Server.Users.Workers.InactiveUsersCleaning.CommandProcessor import CommandProcessor
+from Server.Users.Workers.InactiveUsersCleaning.Config import amqp as amqp_listener_config
+from Server.Users.Workers.InactiveUsersCleaning.Config import general as general_config
+from Server.Users.Workers.InactiveUsersCleaning.Config import logout_sender as amqp_sender_config
 
 AMQP_SENDER = amqp_sender(send_to_parameters=amqp_sender_config.SEND_TO_PARAMETERS)
 
-AFK_CLEANER = AfkCleaner(
+AFK_CLEANER = CommandProcessor(
     pymongo.MongoClient(host=db_config.HOST, port=db_config.PORT).project_world,
     AMQP_SENDER,
     general_config

@@ -4,7 +4,6 @@ HOST = "192.168.99.100"
 # Порт очереди для прослушивания.
 PORT = 32778
 
-
 # Используем ли SSL.
 USE_SSL = False
 
@@ -24,9 +23,9 @@ PASSWORD = 'guest'
 
 LISTEN_FROM_PARAMETERS = {
     'url': 'amqp://{0}:{1}@{2}:{3}/%2F'.format(USER, PASSWORD, HOST, PORT),
-    'exchange_type': 'topic',
-    'exchange': 'user_activity',
-    'queue': 'user_activity',
-    'routing_key': 'user_activity',
+    'exchange_type': 'fanout',
+    'exchange': 'authorization_events',
+    'queue': 'authorization_events_user_notifier',
+    'routing_key': '',
     'prefetch_count': 1
 }

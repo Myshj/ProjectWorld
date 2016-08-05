@@ -1,8 +1,8 @@
 import logging
 
 from BaseClasses.AMQP.Async.PeriodicSender import Worker as amqp_periodic_sender
-from Databases.Users.Periodics.AfkCleaner.Config import amqp as amqp_config
-from Databases.Users.Periodics.AfkCleaner.Config import general as general_config
+from Server.Users.Periodics.AfkCleaner.Config import amqp as amqp_config
+from Server.Users.Periodics.AfkCleaner.Config import general as general_config
 
 PERIODIC_AFK_CLEANER = amqp_periodic_sender(amqp_config.SEND_TO_PARAMETERS,
                                             publish_interval=general_config.INTERVAL,

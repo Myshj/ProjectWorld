@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-class AfkCleaner(object):
+class CommandProcessor(object):
     def __init__(self, db, logout_sender, config):
         self._db = db
         self._logout_sender = logout_sender

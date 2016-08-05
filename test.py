@@ -1,6 +1,6 @@
-from Databases.Users.Workers.Login.tasks import login_user, logout_user
-from Databases.Users.Workers.Registration.tasks import remove_user, register_user
-from Databases.Users.Workers.UserActivityReporter.tasks import report_user_activity
+from Server.Users.Workers.Login.tasks import login_user, logout_user
+from Server.Users.Workers.Registration.tasks import remove_user, register_user
+from Server.Users.Workers.UserActivityReporter.tasks import report_user_activity
 
 result = remove_user.delay('test', 'test')
 result = register_user.delay("test", 'test', ['test@test.com', 'test1@test.com'])

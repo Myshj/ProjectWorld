@@ -142,7 +142,8 @@ class Worker(object):
         :param str|unicode queue_name: The name of the queue to declare.
         """
         LOGGER.info('Declaring queue %s', queue_name)
-        self._channel.queue_declare(self.on_queue_declareok, queue_name)
+        self._channel.queue_declare(self.on_queue_declareok, queue_name,
+                                    exclusive=self._send_to_parameters.get('exclusive', False))
 
     def on_queue_declareok(self, method_frame):
         """Method invoked by pika when the Queue.Declare RPC call made in

@@ -1,4 +1,4 @@
-class UserActivityReporter(object):
+class CommandProcessor(object):
     def __init__(self, db):
         self._db = db
 
